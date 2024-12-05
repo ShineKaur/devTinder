@@ -62,10 +62,24 @@ const userSchema = new mongoose.Schema({
     skills: {
         type: [String]
     }
-}, {
+}, 
+{
     timestamps: true
 });
 
-const User = mongoose.model('User', userSchema);
+userSchema.methods.getJWT = async function() {
+    //don't ever create it as arrow function since "this" keyword won't work in that case
+    const user = this;
+    const token = await jwt.sign({ _id: user._id }, "Dev@Tinder28", {
+        expiresIn : '1d'
+    });
+    return token;
+};
 
-module.exports = User;
+userSchema.methods.validatePassword = async function(passwordInputByUser) {
+    const user = this;
+    const isPasswordValid = await bcrypt.compare(passwordInputByUser, user.password);
+    return isPasswordValid;
+};
+
+module.exports = mongoose.model('User', userSchema);
