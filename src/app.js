@@ -1,91 +1,38 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
 
 const app = express();
 
 const connectDB = require('./config/database');
 const User = require('./models/user');
-const { validateSignUpData } = require('./utils/validation.js');
-const { userAuth } = require('./middlewares/auth.js');
 
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
-app.post('/signup', async (req, res) => {
-    try {
-        //1st STEP: Validation of data
-        validateSignUpData(req);
+const authRouter = require('./routes/auth');
+const profileRouter = require('./routes/profile');
+const requestRouter = require('./routes/request');
 
-        const { firstName, lastName, emailId, password } = req.body;
+app.use('/', authRouter);
+app.use('/', profileRouter);
+app.use('/', requestRouter);
 
-        //2nd STEP: Encrypt the password
-        const passwordHash = await bcrypt.hash(password, 10);
-
-        //Create a new instance of the User model.
-        const userObj = new User({
-            firstName,
-            lastName,
-            emailId,
-            password: passwordHash
+connectDB()
+    .then(() => {
+        console.log('DB connection successfull....');
+        app.listen(3000, () => {
+            console.log('PORT started on 3000...');
         });
-
-        await userObj.save();
-        //await User.insertMany(req.body); -- if need to add multiple docs. no need to create diff model as in 12 line.
-        res.send('Data saved successfully...');
-    } catch (error) {
-        res.status(400).send('Error saving User: ' + error.message);
     }
-});
+    )
+    .catch((err) => {
+        console.log('Database connection failed...');
+    });
 
-app.post('/login', async (req, res) => {
-    try {
-        const { emailId, password } = req.body;
 
-        const user = await User.findOne({ emailId: emailId });
+/* 
+############# Examples of other requests ###############
 
-        if (!user) {
-            throw new Error("Invalid credentials!");
-        }
-
-        const isPasswordValid = await user.validatePassword(password);
-
-        if (isPasswordValid) {
-
-            //Creat JWT Token
-            const token = await user.getJWT();
-
-            //send token in cookie
-            res.cookie('token', token, {
-                expires: new Date(Date.now() + 8 * 3600000),
-            });
-
-            res.status(200).send("Login Successful!!!");
-        } else {
-            throw new Error("Invalid credentials!");
-        }
-
-    } catch (err) {
-        res.status(400).send('ERROR: ' + err);
-    }
-});
-
-app.get('/profile', userAuth, async (req, res) => {
-    try {
-        const user = await req.user;
-        res.send(user);
-    } catch(error) {
-        console.log('ee')
-        res.status(400).send('ERROR: ' + error.message);
-    }
-    
-});
-
-app.post('/sendConnectionRequest', userAuth, async(req, res) => {
-    const user = await req.user;
-    res.send(user.firstName + ' sent the connection request'); 
-});
 
 app.get('/user', async (req, res) => {
     try {
@@ -150,14 +97,4 @@ app.patch('/user/:userId', async (req, res) => {
     }
 });
 
-connectDB()
-    .then(() => {
-        console.log('DB connection successfull....');
-        app.listen(3000, () => {
-            console.log('PORT started on 3000...');
-        });
-    }
-    )
-    .catch((err) => {
-        console.log('Database connection failed...');
-    });
+*/
