@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: true,
+        index: true,
         minLength: 4,
         maxLength: 50
     },
@@ -75,7 +76,7 @@ userSchema.methods.getJWT = async function() {
     const token = await jwt.sign({ _id: user._id }, "Dev@Tinder28", {
         expiresIn : '1d'
     });
-    return token;
+    return token; 
 };
 
 userSchema.methods.validatePassword = async function(passwordInputByUser) {
