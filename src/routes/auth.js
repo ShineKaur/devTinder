@@ -28,7 +28,7 @@ authRouter.post("/signup", async (req, res) => {
         //await User.insertMany(req.body); -- if need to add multiple docs. no need to create diff model as in 12 line.
         res.send('Data saved successfully...');
     } catch (error) {
-        res.status(400).send('Error saving User: ' + error.message);
+        res.status(400).json({ message: error.message});
     }
 });
 
@@ -60,7 +60,7 @@ authRouter.post("/login", async (req, res) => {
         }
 
     } catch (err) {
-        res.status(400).send('ERROR: ' + err);
+        res.status(400).json({ message: error.message});
     }
 });
 

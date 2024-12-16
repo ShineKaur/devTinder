@@ -51,7 +51,7 @@ requestRouter.post('/request/send/:status/:toUserId', userAuth, async (req, res)
             data
         });
     } catch (err) {
-        res.status(400).send('ERROR: ' + err.message);
+        res.status(400).json({ message: error.message});
     }
 
 });
@@ -82,7 +82,7 @@ requestRouter.post('/request/review/:status/:requestId', userAuth, async (req, r
         res.json({message: 'Connection request ' + status, data});
 
     } catch (err) {
-        res.status(400).send('ERROR: ' + err.message);
+        res.status(400).json({ message: error.message});
     }
 });
 

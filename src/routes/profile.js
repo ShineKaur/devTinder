@@ -33,7 +33,7 @@ profileRouter.post("/profile/edit", userAuth, async (req, res) => {
             data: loggedInUser
         })
     } catch(error) {
-        res.status(400).send('ERROR: '+ error.message);
+        res.status(400).json({ message: error.message});
     }
 });
 
@@ -54,7 +54,7 @@ profileRouter.patch("/profile/changepassword", userAuth, async (req, res) => {
 
         res.status(200).send(`${passwordChangeUser.firstName}, your password has been updated.`);
     } catch(err) {
-        res.status(400).send('ERROR: ' + err.message);
+        res.status(400).json({ message: error.message});
     }
 });
 
@@ -75,7 +75,7 @@ profileRouter.patch("/profile/forgotpassword", async (req, res) => {
 
         res.status(200).send(`Your password has been updated.`);
     } catch(error) {
-        res.status(400).send('ERROR: ' + error.message);
+        res.status(400).json({ message: error.message});
     }
     
 });
